@@ -1,7 +1,7 @@
 fn OnMult(m_ar: usize, m_br: usize) {
-    let mut pha = vec![1.0; m_ar * m_ar];
-    let mut phb = vec![0.0; m_ar * m_ar];
-    let mut phc = vec![0.0; m_ar * m_ar];
+    let mut pha = vec![1.0 as f64; m_ar * m_ar];
+    let mut phb = vec![0.0 as f64; m_ar * m_ar];
+    let mut phc = vec![0.0 as f64; m_ar * m_ar];
 
     for i in 0..m_br {
         for j in 0..m_br {
