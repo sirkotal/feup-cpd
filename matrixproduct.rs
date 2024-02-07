@@ -8,4 +8,29 @@ fn OnMult(m_ar: usize, m_br: usize) {
             phb[i * m_br + j] = (i + 1) as f64;
         }
     }
+
+    let start = std::time::Instant::now();
+
+    for i in 0..m_ar {
+        for j in 0..m_br {
+            let mut temp = 0.0;
+            for k in 0..m_ar {
+                temp += pha[i * m_ar + k] * phb[k * m_br + j];
+            }
+            phc[i * m_ar + j] = temp;
+        }
+    }
+
+    let end = std::time::Instant::now();
+    let duration = end - start;
+
+    println!("Time: {:.3} seconds", duration.as_secs_f64());
+
+    println!("Result matrix: ");
+
+    for j in 0..std::cmp::min(10, m_br) {
+        println!("{} ", phc[j]);
+    }
+
+    println!();
 }
