@@ -139,6 +139,7 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 	char st[100];
 	double temp;
 	int i, j, k;
+	int x, y, z;
 
 	double *pha, *phb, *phc;
 	
@@ -161,6 +162,20 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 
 
     Time1 = clock(); 
+
+	for (x = 0; x < (m_ar / bkSize); x++) {	
+		for (z = 0; z < (m_ar / bkSize); z++) {	
+			for (y = 0; y < (m_ar / bkSize); y++) {	
+				for (i = x * bkSize; i < (x + 1) * bkSize; i++) {	
+					for (k = z * bkSize; k < (z + 1) * bkSize; k++) {	
+						for (j = y * bkSize; j < (y + 1) * bkSize; j++) {	
+							phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j];
+						}
+					}
+				}
+			}
+		}
+	}
     
 	Time2 = clock();
 	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
