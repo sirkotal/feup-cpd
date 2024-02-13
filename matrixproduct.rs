@@ -83,9 +83,9 @@ fn OnMultBlock(m_ar: usize, m_br: usize, bk_size: usize) {
 
     let start = std::time::Instant::now();
 
-    for x in 0..(m_ar * bk_size) {
-        for z in 0..(m_ar * bk_size) {
-            for y in 0..(m_ar * bk_size) {
+    for x in 0..(m_ar / bk_size) {
+        for z in 0..(m_ar / bk_size) {
+            for y in 0..(m_ar / bk_size) {
                 for i in (x * bk_size)..((x + 1) * bk_size) {
                     for k in (z * bk_size)..((z + 1) * bk_size) {
                         for j in (y * bk_size)..((y + 1) * bk_size) {
@@ -109,4 +109,8 @@ fn OnMultBlock(m_ar: usize, m_br: usize, bk_size: usize) {
     }
 
     println!();
+}
+
+fn main() {
+    OnMultBlock(500, 500, 4);
 }
