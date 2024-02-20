@@ -316,15 +316,9 @@ enum Type {
     BLOCK,
 };
 
-std::string shift_args(int *argc, char **argv) {
-    *argc -= 1;
-
-    std::string arg = argv[0];
-    for (int i = 0; i < *argc; i++) {
-        argv[i] = argv[i+1];
-    }
-
-    return arg;
+std::string shift_args(int *argc, char ***argv) {
+    (*argc)--;
+    return *((*argv)++);
 }
 
 void help_screen(std::string& prog_name) {
@@ -347,7 +341,7 @@ int main (int argc, char *argv[])
   	long long values[2];
   	int ret;
 
-    std::string prog_name = shift_args(&argc, argv);
+    std::string prog_name = shift_args(&argc, &argv);
 
     if (argc == 0) {
         help_screen(prog_name);
@@ -355,10 +349,10 @@ int main (int argc, char *argv[])
     }
 
     while (argc != 0) {
-        std::string input = shift_args(&argc, argv);
+        std::string input = shift_args(&argc, &argv);
 
         if (input == "-t" || input == "--type") {
-            input = shift_args(&argc, argv);
+            input = shift_args(&argc, &argv);
 
             if (input == "default") {
                 op = DEFAULT;
@@ -369,11 +363,11 @@ int main (int argc, char *argv[])
                 op = BLOCK;
             }
         } else if (input == "-d" || input == "--dimension") {
-            input = shift_args(&argc, argv);
+            input = shift_args(&argc, &argv);
             lin = std::stoi(input);
             col = std::stoi(input);
         } else if (input == "-b" || input == "--block") {
-            input = shift_args(&argc, argv);
+            input = shift_args(&argc, &argv);
             blockSize = std::stoi(input);
         } else if (input == "-h" || input == "--help") {
             help_screen(prog_name);
