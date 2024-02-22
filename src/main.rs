@@ -25,7 +25,7 @@ fn on_mult(m_ar: usize, m_br: usize) {
     }
 
     let end = start.elapsed();
-    println!("Time: {:.3} seconds", end.as_secs_f64());
+    println!("Time: {:3.3} seconds", end.as_secs_f64());
 
     println!("Result Matrix:");
     for j in 0..std::cmp::min(m_br, 10) {
@@ -56,7 +56,7 @@ fn on_mult_line(m_ar: usize, m_br: usize) {
     }
 
     let end = start.elapsed();
-    println!("Time: {:.3} seconds", end.as_secs_f64());
+    println!("Time: {:3.3} seconds", end.as_secs_f64());
 
     println!("Result Matrix:");
     for j in 0..std::cmp::min(m_br, 10) {
@@ -93,7 +93,7 @@ fn on_mult_block(m_ar: usize, m_br: usize, block_size: usize) {
     }
 
     let end = start.elapsed();
-    println!("Time: {:.3} seconds", end.as_secs_f64());
+    println!("Time: {:3.3} seconds", end.as_secs_f64());
 
     println!("Result Matrix:");
     for j in 0..std::cmp::min(m_br, 10) {
