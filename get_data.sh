@@ -28,13 +28,13 @@ get_data () {
         # L2 Cache Misses
         l2_misses=$(cat $2 | tail -n1 | cut -d ' ' -f 3)
 
-        if [[ -v $5 ]]; then
+        if [[ -n "$5" ]]; then
             echo "$1,$5,$time,$l1_misses,$l2_misses" >> $3
         else
             echo "$1,$time,$l1_misses,$l2_misses" >> $3
         fi
     elif [ $4 = "rust" ]; then
-        if [[ -v $5 ]]; then
+        if [[ -n "$5" ]]; then
             echo "$1,$5,$time" >> $3
         else
             echo "$1,$time" >> $3
@@ -49,8 +49,6 @@ get_data () {
 # $4 - "cpp" or "rust"
 # $5 - block size (optional)
 run_code () {
-    # for some reason, $5 is not being passed to get_data correctly
-
     if [ $4 = "cpp" ]; then
         for i in {1..3}; do
             sh -c "$1" > temp.txt
