@@ -5,6 +5,8 @@ fn on_mult(m_ar: usize, m_br: usize) {
     let mut phb = vec![0.0; m_ar * m_ar];
     let mut phc = vec![0.0; m_ar * m_ar];
 
+    let mut temp;
+
     for i in 0..m_br {
         for j in 0..m_br {
             phb[i * m_br + j] = (i + 1) as f64;
@@ -15,7 +17,7 @@ fn on_mult(m_ar: usize, m_br: usize) {
 
     for i in 0..m_ar {
         for j in 0..m_br {
-            let mut temp = 0.0;
+            temp = 0.0;
             for k in 0..m_ar {
                 temp += pha[i * m_ar + k] * phb[k * m_br + j];
             }
