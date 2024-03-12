@@ -203,7 +203,7 @@ void OnMultLineP1(int m_ar, int m_br)
 
     Time1 = clock();
 
-	#pragma omp parallel for
+	#pragma omp parallel private(i, j, k, temp)
 	for (i = 0; i < m_ar; i++) {	
 		for (k = 0; k < m_ar; k++) {	
 			for (j = 0; j < m_br; j++) {	
@@ -261,10 +261,10 @@ void OnMultLineP2(int m_ar, int m_br)
 
     Time1 = clock();
 
-	#pragma omp parallel for
+	#pragma omp parallel private(i, k)
 	for (i = 0; i < m_ar; i++) {	
 		for (k = 0; k < m_ar; k++) {	
-			#pragma omp for
+			#pragma omp for private(j)
 			for (j = 0; j < m_br; j++) {	
 				phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j];
 			}
