@@ -29,3 +29,20 @@ Three different algorithms were used in this project - the goal being to evaluat
 Since we were required to utilize C++, we decided to use Rust as the secondary programming language - its similarities to C++, alongside its superior memory safety and concurrency features, made it a rather interesting choice from our point of view.
 
 ## Algorithms Explanation
+
+### Simple Matrix Multiplication
+
+A simple matrix multiplication algorithm implementation was provided to us in C++ - we later decided to implement the second version of it in Rust.
+The algorithm itself consists in obtaining the result in the *i-th* row and *j-th* column of matrix C via the product of the elements in the *i-th* row of matrix A and the *j-th* column of matrix B.
+
+If we consider a square matrix with *n* lines and columns, the time complexity of this algorithm should be O(n<sup>3</sup>).
+
+### Line Matrix Multiplication
+
+This algorithm uses the one mentioned earlier as a basis, although with a key difference: the order of the second and third ```for``` loops is switched.
+
+## Performance Metrics
+
+## Results and Analysis
+
+## Conclusion
