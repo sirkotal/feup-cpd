@@ -37,6 +37,18 @@ The algorithm itself consists in obtaining the result in the *i-th* row and *j-t
 
 If we consider a square matrix with *n* lines and columns, the time complexity of this algorithm should be O(n<sup>3</sup>).
 
+```cpp
+for(i = 0; i < m_ar; i++) {	
+    for(j = 0; j < m_br; j++) {	
+        temp = 0;
+		for(k = 0; k < m_ar; k++) {	
+			temp += pha[i*m_ar+k] * phb[k*m_br+j];
+		}
+		phc[i*m_ar+j]=temp;
+	}
+}
+```
+
 ### Line Matrix Multiplication
 
 This algorithm, having been implemented in both C++ and Rust, uses the one mentioned earlier as a basis, although with a key difference: the order of the second and third ```for``` loops is switched.
@@ -45,8 +57,33 @@ This algorithm obtains the result in the *i-th* row and *j-th* column of matrix 
 
 If we consider a square matrix with *n* lines and columns, the time complexity of this algorithm should be similar to the time complexity of the simple algorithm - O(n<sup>3</sup>).
 
+```cpp
+for (i = 0; i < m_ar; i++) {
+    for (k = 0; k < m_ar; k++) {
+        for (j = 0; j < m_br; j++) {
+            phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j];
+        }
+    }
+}
+```
+
 ### Block Matrix Multiplication
 
+```cpp
+for (int b1 = 0; b1 < m_ar; b1 += bkSize) {
+        for (int b3 = 0; b3 < m_ar; b3 += bkSize) {
+            for (int b2 = 0; b2 < m_br; b2 += bkSize) {
+                for (int i = b1; i < b1 + bkSize; i++) {
+                    for (int k = b3; k < b3 + bkSize; k++) {
+                        for (int j = b2; j < b2 + bkSize; j++) {
+                            phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j];
+                        }
+                    }
+                }
+            }
+        }
+    }
+```
 
 ## Performance Metrics
 
