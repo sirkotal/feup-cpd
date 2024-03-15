@@ -39,7 +39,14 @@ If we consider a square matrix with *n* lines and columns, the time complexity o
 
 ### Line Matrix Multiplication
 
-This algorithm uses the one mentioned earlier as a basis, although with a key difference: the order of the second and third ```for``` loops is switched.
+This algorithm, having been implemented in both C++ and Rust, uses the one mentioned earlier as a basis, although with a key difference: the order of the second and third ```for``` loops is switched.
+
+This algorithm obtains the result in the *i-th* row and *j-th* column of matrix C by calculating the product of the elements in the *i-th* row of matrix A and the *j-th* column of matrix B.
+
+If we consider a square matrix with *n* lines and columns, the time complexity of this algorithm should be similar to the time complexity of the simple algorithm - O(n<sup>3</sup>).
+
+### Block Matrix Multiplication
+
 
 ## Performance Metrics
 
