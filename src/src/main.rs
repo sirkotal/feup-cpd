@@ -134,7 +134,7 @@ fn main() -> Result<(), &'static str> {
             if let Some(block_size) = args.block_size {
                 Ok(on_mult_block(args.dimension, args.dimension, block_size))
             } else {
-                return Err("Block size is required for block multiplication");
+                Err("Block size is required for block multiplication")
             }
         }
     }

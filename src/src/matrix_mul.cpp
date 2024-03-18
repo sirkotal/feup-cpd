@@ -2,26 +2,28 @@
 #include <iostream>
 #include <iomanip>
 #include <time.h>
+#include <sys/time.h>
 #include <cstdlib>
 #include <papi.h>
+
+#ifdef _OPENMP
+    #include <omp.h>
+#else
+    #define omp_get_wtime() 0
+#endif
 
 using namespace std;
 
 #define SYSTEMTIME clock_t
-
  
-void OnMult(int m_ar, int m_br) 
-{
-	
+void OnMult(int m_ar, int m_br) {
 	SYSTEMTIME Time1, Time2;
-	
+
 	char st[100];
 	double temp;
 	int i, j, k;
 
 	double *pha, *phb, *phc;
-	
-
 		
     pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
 	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
@@ -31,37 +33,32 @@ void OnMult(int m_ar, int m_br)
 		for(j=0; j<m_ar; j++)
 			pha[i*m_ar + j] = (double)1.0;
 
-
-
 	for(i=0; i<m_br; i++)
 		for(j=0; j<m_br; j++)
 			phb[i*m_br + j] = (double)(i+1);
 
-
-
     Time1 = clock();
 
-	for(i=0; i<m_ar; i++)
-	{	for( j=0; j<m_br; j++)
-		{	temp = 0;
-			for( k=0; k<m_ar; k++)
-			{	
+	for(i=0; i<m_ar; i++) {
+        for( j=0; j<m_br; j++) {
+            temp = 0;
+			for( k=0; k<m_ar; k++) {	
 				temp += pha[i*m_ar+k] * phb[k*m_br+j];
 			}
 			phc[i*m_ar+j]=temp;
 		}
 	}
 
-
     Time2 = clock();
 	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 	cout << st;
 
-	// display 10 elements of the result matrix to verify correctness
+	// display 10 elements of the result matrix tto verify correctness
 	cout << "Result matrix: " << endl;
-	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << phc[j] << " ";
+	for(i=0; i<1; i++) {
+        for(j=0; j<min(10,m_br); j++) {
+            cout << phc[j] << " ";
+        }
 	}
 	cout << endl;
 
@@ -71,8 +68,7 @@ void OnMult(int m_ar, int m_br)
 }
 
 // add code here for line x line matrix multiplication
-void OnMultLine(int m_ar, int m_br)
-{
+void OnMultLine(int m_ar, int m_br) {
 	SYSTEMTIME Time1, Time2;
 
 	char st[100];
@@ -105,11 +101,12 @@ void OnMultLine(int m_ar, int m_br)
 	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 	cout << st;
 
-	// display 10 elements of the result matrix tto verify correctness
+	// display 10 elements of the result matrix to verify correctness
 	cout << "Result matrix: " << endl;
-	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << phc[j] << " ";
+	for(i=0; i<1; i++) {
+        for(j=0; j<min(10,m_br); j++) {
+            cout << phc[j] << " ";
+        }
 	}
 	cout << endl;
 
@@ -118,9 +115,8 @@ void OnMultLine(int m_ar, int m_br)
     free(phc);
 }
 
-// add code here for block x block matriz multiplication
-void OnMultBlock(int m_ar, int m_br, int bkSize)
-{
+// add code here for block x block matrix multiplication
+void OnMultBlock(int m_ar, int m_br, int bkSize) {
 	SYSTEMTIME Time1, Time2;
 
 	char st[100];
@@ -159,11 +155,12 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
 	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 	cout << st;
 
-	// display 10 elements of the result matrix tto verify correctness
+	// display 10 elements of the result matrix to verify correctness
 	cout << "Result matrix: " << endl;
-	for(i=0; i<1; i++)
-	{	for(j=0; j<min(10,m_br); j++)
-			cout << phc[j] << " ";
+	for(i=0; i<1; i++) {
+        for(j=0; j<min(10,m_br); j++) {
+            cout << phc[j] << " ";
+        }
 	}
 	cout << endl;
 
@@ -172,19 +169,120 @@ void OnMultBlock(int m_ar, int m_br, int bkSize)
     free(phc);
 }
 
-void OnMultLineP1(int m_ar, int m_br)
-{
+void OnMultP1(int m_ar, int m_br) {
+	double Time1, Time2;
 
-	SYSTEMTIME Time1, Time2;
+	char st[100];
+	double temp;
+	int i, j, k;
+
+	double *pha, *phb, *phc;
+
+    pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
+
+	for(i=0; i<m_ar; i++)
+		for(j=0; j<m_ar; j++)
+			pha[i*m_ar + j] = (double)1.0;
+
+	for(i=0; i<m_br; i++)
+		for(j=0; j<m_br; j++)
+			phb[i*m_br + j] = (double)(i+1);
+
+    Time1 = omp_get_wtime();
+
+    #pragma omp parallel for private(i, j, k)
+	for(i=0; i<m_ar; i++) {
+        for( j=0; j<m_br; j++) {
+            temp = 0;
+			for( k=0; k<m_ar; k++) {	
+				temp += pha[i*m_ar+k] * phb[k*m_br+j];
+			}
+			phc[i*m_ar+j]=temp;
+		}
+	}
+
+    Time2 = omp_get_wtime();
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
+	cout << st;
+
+	// display 10 elements of the result matrix tto verify correctness
+	cout << "Result matrix: " << endl;
+	for(i=0; i<1; i++) {
+        for(j=0; j<min(10,m_br); j++) {
+            cout << phc[j] << " ";
+        }
+	}
+	cout << endl;
+
+    free(pha);
+    free(phb);
+    free(phc);
+}
+
+void OnMultP2(int m_ar, int m_br) {
+	double Time1, Time2;
 	
 	char st[100];
 	double temp;
 	int i, j, k;
 
 	double *pha, *phb, *phc;
-	
-
 		
+    pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
+	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
+
+	for(i=0; i<m_ar; i++)
+		for(j=0; j<m_ar; j++)
+			pha[i*m_ar + j] = (double)1.0;
+
+	for(i=0; i<m_br; i++)
+		for(j=0; j<m_br; j++)
+			phb[i*m_br + j] = (double)(i+1);
+
+    Time1 = omp_get_wtime();
+
+    #pragma omp parallel private(i, j)
+	for(i=0; i<m_ar; i++) {
+        for( j=0; j<m_br; j++) {
+            temp = 0;
+            #pragma omp for
+			for( k=0; k<m_ar; k++) {	
+				temp += pha[i*m_ar+k] * phb[k*m_br+j];
+			}
+			phc[i*m_ar+j]=temp;
+		}
+	}
+
+    Time2 = omp_get_wtime();
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
+	cout << st;
+
+	// display 10 elements of the result matrix tto verify correctness
+	cout << "Result matrix: " << endl;
+	for(i=0; i<1; i++) {
+        for(j=0; j<min(10,m_br); j++) {
+            cout << phc[j] << " ";
+        }
+	}
+	cout << endl;
+
+    free(pha);
+    free(phb);
+    free(phc);
+}
+
+void OnMultLineP1(int m_ar, int m_br) {
+	double Time1, Time2;
+
+	char st[100];
+	double temp;
+	int i, j, k;
+
+	double *pha, *phb, *phc;
+
     pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
 	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
 	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
@@ -193,17 +291,13 @@ void OnMultLineP1(int m_ar, int m_br)
 		for (j = 0; j < m_ar; j++)
 			pha[i*m_ar + j] = (double)1.0;
 
-
-
 	for (i = 0; i < m_br; i++)
 		for (j = 0; j < m_br; j++)
 			phb[i*m_br + j] = (double)(i+1);
 
+    Time1 = omp_get_wtime();
 
-
-    Time1 = clock();
-
-	#pragma omp parallel private(i, j, k, temp)
+	#pragma omp parallel for private(i, j, k)
 	for (i = 0; i < m_ar; i++) {	
 		for (k = 0; k < m_ar; k++) {	
 			for (j = 0; j < m_br; j++) {	
@@ -212,37 +306,33 @@ void OnMultLineP1(int m_ar, int m_br)
 		}
 	}
 
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+    Time2 = omp_get_wtime();
+
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
 	cout << st;
 
 	cout << "Result matrix: " << endl;
 	for (i = 0; i < 1; i++) {	
-		for (j = 0; j < min(10, m_br); j++)
-			cout << phc[j] << " ";
+		for (j = 0; j < min(10, m_br); j++) {
+            cout << phc[j] << " ";
+        }
 	}
 	cout << endl;
 
     free(pha);
     free(phb);
     free(phc);
-	
-    
 }
 
-void OnMultLineP2(int m_ar, int m_br)
-{
+void OnMultLineP2(int m_ar, int m_br) {
+	double Time1, Time2;
 
-	SYSTEMTIME Time1, Time2;
-	
 	char st[100];
 	double temp;
 	int i, j, k;
 
 	double *pha, *phb, *phc;
-	
 
-		
     pha = (double *)malloc((m_ar * m_ar) * sizeof(double));
 	phb = (double *)malloc((m_ar * m_ar) * sizeof(double));
 	phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
@@ -251,63 +341,56 @@ void OnMultLineP2(int m_ar, int m_br)
 		for (j = 0; j < m_ar; j++)
 			pha[i*m_ar + j] = (double)1.0;
 
-
-
 	for (i = 0; i < m_br; i++)
 		for (j = 0; j < m_br; j++)
 			phb[i*m_br + j] = (double)(i+1);
 
-
-
-    Time1 = clock();
+    Time1 = omp_get_wtime();
 
 	#pragma omp parallel private(i, k)
 	for (i = 0; i < m_ar; i++) {	
 		for (k = 0; k < m_ar; k++) {	
-			#pragma omp for
+            #pragma omp for
 			for (j = 0; j < m_br; j++) {	
 				phc[i*m_ar+j] += pha[i*m_ar+k] * phb[k*m_br+j];
 			}
 		}
 	}
 
-    Time2 = clock();
-	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1) / CLOCKS_PER_SEC);
+    Time2 = omp_get_wtime();
+
+	sprintf(st, "Time: %3.3f seconds\n", (double)(Time2 - Time1));
 	cout << st;
 
 	cout << "Result matrix: " << endl;
 	for (i = 0; i < 1; i++) {	
-		for (j = 0; j < min(10, m_br); j++)
-			cout << phc[j] << " ";
+		for (j = 0; j < min(10, m_br); j++) {
+            cout << phc[j] << " ";
+        }
 	}
 	cout << endl;
 
     free(pha);
     free(phb);
     free(phc);
-	
-    
 }
 
-
-
-void handle_error (int retval)
-{
-  printf("PAPI error %d: %s\n", retval, PAPI_strerror(retval));
-  exit(1);
+void handle_error (int retval) {
+    printf("PAPI error %d: %s\n", retval, PAPI_strerror(retval));
+    exit(1);
 }
 
 void init_papi() {
-  int retval = PAPI_library_init(PAPI_VER_CURRENT);
-  if (retval != PAPI_VER_CURRENT && retval < 0) {
-    printf("PAPI library version mismatch!\n");
-    exit(1);
-  }
-  if (retval < 0) handle_error(retval);
+    int retval = PAPI_library_init(PAPI_VER_CURRENT);
+    if (retval != PAPI_VER_CURRENT && retval < 0) {
+        printf("PAPI library version mismatch!\n");
+        exit(1);
+    }
+    if (retval < 0) handle_error(retval);
 
-  std::cout << "PAPI Version Number: MAJOR: " << PAPI_VERSION_MAJOR(retval)
-            << " MINOR: " << PAPI_VERSION_MINOR(retval)
-            << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
+    std::cout   << "PAPI Version Number: MAJOR: " << PAPI_VERSION_MAJOR(retval)
+                << " MINOR: " << PAPI_VERSION_MINOR(retval)
+                << " REVISION: " << PAPI_VERSION_REVISION(retval) << "\n";
 }
 
 enum Type {
@@ -324,25 +407,25 @@ std::string shift_args(int *argc, char ***argv) {
 void help_screen(std::string& prog_name) {
     std::cout << "Usage: " << prog_name << " [options]" << std::endl;
     std::cout << "Options:" << std::endl;
-    std::cout << "  -t, --type <type>      Type of multiplication (default, line, block)" << std::endl;
-    std::cout << "  -d, --dimension <dim>  Dimension of the matrix (default = 1024)" << std::endl;
-    std::cout << "  -b, --block <size>     Block size for block multiplication" << std::endl;
+    std::cout << "  -t, --type <type>           Type of multiplication (default, line, block)" << std::endl;
+    std::cout << "  -d, --dimension <dim>       Dimension of the matrix (default = 1024)" << std::endl;
+    std::cout << "  -b, --block <size>          Block size for block multiplication" << std::endl;
+    std::cout << "  -p, --parallel <version>    Parallel Version (optional) (version: 1 or 2)" << std::endl;
 }
 
-int main (int argc, char *argv[])
-{
-
+int main (int argc, char *argv[]) {
 	char c;
     int blockSize = 0;
 	int lin, col = 1024;
     enum Type op = DEFAULT;
-	
+
 	int EventSet = PAPI_NULL;
   	long long values[2];
   	int ret;
 
-    std::string prog_name = shift_args(&argc, &argv);
+    int parallel = -1;
 
+    std::string prog_name = shift_args(&argc, &argv);
     if (argc == 0) {
         help_screen(prog_name);
         return 1;
@@ -369,6 +452,15 @@ int main (int argc, char *argv[])
         } else if (input == "-b" || input == "--block") {
             input = shift_args(&argc, &argv);
             blockSize = std::stoi(input);
+        } else if (input == "-p" || input == "--parallel") {
+            input = shift_args(&argc, &argv);
+            parallel = std::stoi(input);
+
+            if (parallel != 1 && parallel != 2) {
+                std::cerr << "Invalid parallel value: " << parallel << std::endl;
+                help_screen(prog_name);
+                return 1;
+            }
         } else if (input == "-h" || input == "--help") {
             help_screen(prog_name);
             return 0;
@@ -383,14 +475,11 @@ int main (int argc, char *argv[])
 	if ( ret != PAPI_VER_CURRENT )
 		std::cout << "FAIL" << endl;
 
-
 	ret = PAPI_create_eventset(&EventSet);
 		if (ret != PAPI_OK) cout << "ERROR: create eventset" << endl;
 
-
 	ret = PAPI_add_event(EventSet,PAPI_L1_DCM );
 	if (ret != PAPI_OK) cout << "ERROR: PAPI_L1_DCM" << endl;
-
 
 	ret = PAPI_add_event(EventSet,PAPI_L2_DCM);
     if (ret != PAPI_OK) cout << "ERROR: PAPI_L2_DCM" << endl;
@@ -401,12 +490,48 @@ int main (int argc, char *argv[])
 
     switch (op){
         case DEFAULT: 
-            OnMult(lin, col);
+            switch (parallel) {
+                case -1:
+                    OnMult(lin, col);
+                break;
+                case 1:
+                    OnMultP1(lin, col);
+                break;
+                case 2:
+                    OnMultP2(lin, col);
+                break;
+                default:
+                    std::cerr << "Invalid parallel version: " << parallel << std::endl;
+                    help_screen(prog_name);
+                    return 1;
+                break;
+            }
         break;
         case LINE:
-            OnMultLine(lin, col);  
+            switch (parallel) {
+                case -1:
+                    OnMultLine(lin, col);  
+                break;
+                case 1:
+                    OnMultLineP1(lin, col);
+                break;
+                case 2:
+                    OnMultLineP2(lin, col);
+                break;
+                default:
+                    std::cerr << "Invalid parallel version: " << parallel << std::endl;
+                    help_screen(prog_name);
+                    return 1;
+                break;
+            }
         break;
         case BLOCK:
+            if (parallel != -1) {
+                std::cerr << "Parallel version is not available for block multiplication" << std::endl;
+                help_screen(prog_name);
+                return 1;
+            }
+
             if (!blockSize) {
                 std::cerr << "Block size is required" << std::endl;
                 help_screen(prog_name);
@@ -414,7 +539,6 @@ int main (int argc, char *argv[])
             }
             OnMultBlock(lin, col, blockSize);  
         break;
-
     }
 
     ret = PAPI_stop(EventSet, values);
@@ -437,5 +561,4 @@ int main (int argc, char *argv[])
 	ret = PAPI_destroy_eventset( &EventSet );
 	if ( ret != PAPI_OK )
 		std::cout << "FAIL destroy" << endl;
-
 }
