@@ -1,3 +1,9 @@
+package src;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
 public class Game {
     private List<Socket> userSockets;
 
